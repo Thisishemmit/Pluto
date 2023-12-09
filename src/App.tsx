@@ -15,26 +15,27 @@ async function getClCount(): Promise<number>{
     await client.disconnect()
     return c
 }
-async function getAllCl(): Promise<IClient[]>{
+async function lazyGetCl(limit: number, step: number): Promise<IClient[]>{
     await client.connect()
     await client.setup()
-    const c: IClient[] | null = await client.getAll()
+    const c: IClient[] | null= await client.lazy_getAll(limit, step, "ASC", "id")
     await client.disconnect()
-    return c?.length ? c : []
+    return c!
 }
 export default function App() {
     const [count, setCount] = useState<number>(0)
     const [cl, setCl] = useState<IClient[]>([])
+    const [page, setPage] = useState<number>(0)
     useEffect(() => {
         getClCount().then((c) => {
             setCount(c)
         })
     }, [])
     useEffect(() => {
-        getAllCl().then((c) => {
+        lazyGetCl(10, page).then((c) => {
             setCl(c)
         })
-    }, [])
+    }, [page])
     //we used useEffect because we want to run the function only once
     //if we don't use useEffect, the function will run every time the component is rendered
     //which will cause the count to be incremented every time the component is rendered
@@ -42,10 +43,20 @@ export default function App() {
 
     <div>
         <h1>Count: {count}</h1>
-        <button onClick={addCl}>Add</button>
+        //pagination example
+        <h1>Page: {page}</h1>
+        <button onClick={() => {
+            setPage(page + 1)
+        }}>Prev</button>
+
         <ul>
             {cl.map((c) => {
-                return <li>{c.name}</li>
+                return (
+                    <li key={c.id}>
+                        <h1>{c.name}</h1>
+                        <p>{c.id}</p>
+                    </li>
+                )
             })}
         </ul>
     </div>

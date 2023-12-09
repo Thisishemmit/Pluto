@@ -128,6 +128,10 @@ class Client {
         }
     }
 
+    //mark as duprecated and must uze lazy_getAll
+     /**
+      * @deprecated should use lazy_getAll for better performance
+     */
     public async getAll(sort: "ASC" | "DESC" = "ASC"): Promise<IClient[] | null> {
         if (this.core.DB !== null) {
             let rslt: IClient[] | null = null;
@@ -211,18 +215,77 @@ class Client {
             return false;
         }
     }
-
-    public async search(query: string, sort: "ASC" | "DESC" = "ASC"): Promise<IClient[] | null> {
+    public async lazy_getAll(limit: number = 1000, step: number = 0, sort: "ASC" | "DESC" = "ASC", sortBy: keyof IClient = "id"): Promise<IClient[] | null> {
+        const offset = limit * step;
         if (this.core.DB !== null) {
             let rslt: IClient[] | null = null;
             try {
-                const res: IClient[] = await this.core.DB.select<IClient[]>(`SELECT * FROM clients WHERE name LIKE ? OR phone LIKE ? OR email LIKE ? OR address LIKE ? OR notes LIKE ? OR type LIKE ? ORDER BY id ` + sort, [
+                const res: IClient[] = await this.core.DB.select<IClient[]>(`SELECT * FROM clients ORDER BY ${sortBy} ` + sort + ` LIMIT ? OFFSET ?`, [limit, offset]);
+                if (res.length > 0) {
+                    rslt = res;
+                    if (this.debug) console.log("DB: Clients Found");
+                } else if (res.length === 0) {
+                    rslt = null;
+                    if (this.debug) console.log("DB: Clients Not Found");
+                } else {
+                    rslt = null;
+                    if (this.debug) console.log("DB: Clients Not Found");
+                }
+            } catch (error) {
+                console.error(`Error Getting Clients: ${(error as Error).message}`);
+                rslt = null;
+            }
+            return rslt;
+        } else {
+            return null;
+        }
+    }
+    public async search(query: string, sort: "ASC" | "DESC" = "ASC", sortBy: keyof IClient = "id"): Promise<IClient[] | null> {
+        if (this.core.DB !== null) {
+            let rslt: IClient[] | null = null;
+            try {
+                const res: IClient[] = await this.core.DB.select<IClient[]>(`SELECT * FROM clients WHERE name LIKE ? OR phone LIKE ? OR email LIKE ? OR address LIKE ? OR notes LIKE ? OR type LIKE ? ORDER BY ${sortBy} ` + sort, [
                     `%${query}%`,
                     `%${query}%`,
                     `%${query}%`,
                     `%${query}%`,
                     `%${query}%`,
                     `%${query}%`
+                ]);
+                if (res.length > 0) {
+                    rslt = res;
+                    if (this.debug) console.log("DB: Clients Found");
+                } else if (res.length === 0) {
+                    rslt = null;
+                    if (this.debug) console.log("DB: Clients Not Found");
+                } else {
+                    rslt = null;
+                    if (this.debug) console.log("DB: Clients Not Found");
+                }
+            } catch (error) {
+                console.error(`Error Getting Clients: ${(error as Error).message}`);
+                rslt = null;
+            }
+            return rslt;
+        } else {
+            return null;
+        }
+    }
+
+    public async lazy_search(query: string, limit: number = 1000, step: number = 0, sort: "ASC" | "DESC" = "ASC", sortBy: keyof IClient = "id"): Promise<IClient[] | null> {
+        const offset = limit * step;
+        if (this.core.DB !== null) {
+            let rslt: IClient[] | null = null;
+            try {
+                const res: IClient[] = await this.core.DB.select<IClient[]>(`SELECT * FROM clients WHERE name LIKE ? OR phone LIKE ? OR email LIKE ? OR address LIKE ? OR notes LIKE ? OR type LIKE ? ORDER BY ${sortBy} ` + sort + ` LIMIT ? OFFSET ?`, [
+                    `%${query}%`,
+                    `%${query}%`,
+                    `%${query}%`,
+                    `%${query}%`,
+                    `%${query}%`,
+                    `%${query}%`,
+                    limit,
+                    offset
                 ]);
                 if (res.length > 0) {
                     rslt = res;
