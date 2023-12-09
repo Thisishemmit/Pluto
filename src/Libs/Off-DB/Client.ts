@@ -1,4 +1,4 @@
-import { faker } from "@faker-js/faker";
+import { faker} from "@faker-js/faker";
 import { CoreDB } from "./Core";
 
 export type IClient = {
@@ -20,7 +20,7 @@ class Client {
     constructor(public debug: boolean = true) {
 
     }
-    public async close(): Promise<boolean> {
+    public async disconnect(): Promise<boolean> {
         if (this.core.DB !== null) {
             let rslt = false;
             try {
@@ -55,7 +55,7 @@ class Client {
         if (this.core.DB !== null) {
             let rslt = false;
             console.log(123);
-            
+
             try {
                 await this.core.DB.execute(`CREATE TABLE IF NOT EXISTS clients (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -112,7 +112,7 @@ class Client {
                     rslt = res[0];
                     if (this.debug) console.log("DB: Client Found");
                 } else if (res.length === 0) {
-                    rslt = null; 
+                    rslt = null;
                     if (this.debug) console.log("DB: Client Not Found");
                 } else {
                     rslt = null;
@@ -137,7 +137,7 @@ class Client {
                     rslt = res;
                     if (this.debug) console.log("DB: Clients Found");
                 } else if (res.length === 0) {
-                    rslt = null; 
+                    rslt = null;
                     if (this.debug) console.log("DB: Clients Not Found");
                 } else {
                     rslt = null;
@@ -228,7 +228,7 @@ class Client {
                     rslt = res;
                     if (this.debug) console.log("DB: Clients Found");
                 } else if (res.length === 0) {
-                    rslt = null; 
+                    rslt = null;
                     if (this.debug) console.log("DB: Clients Not Found");
                 } else {
                     rslt = null;
@@ -253,7 +253,7 @@ class Client {
                     rslt = res[0].count;
                     if (this.debug) console.log("DB: Clients Counted");
                 } else if (res.length === 0) {
-                    rslt = 0; 
+                    rslt = 0;
                     if (this.debug) console.log("DB: Clients Not Counted");
                 } else {
                     rslt = 0;
