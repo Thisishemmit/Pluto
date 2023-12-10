@@ -3,7 +3,7 @@ import SQLite from "tauri-plugin-sqlite-api";
 export class CoreDB {
     public DB: SQLite | null = null;
     constructor(public debug: boolean = true) {
-    
+
     }
     public async init(): Promise<boolean> {
         if (this.DB === null) {
